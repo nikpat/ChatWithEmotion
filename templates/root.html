@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Sena Chat</title>
+  <title>Neo Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="format-detection" content="telephone=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,9 +15,11 @@
   
   
   
+  <link rel="stylesheet" href="{{ static_url('emotions/stylesheets/jquery.cssemoticons.css')}}"> 
+  <script src="{{ static_url('js/libs/jquery.min.js') }}" type="text/javascript"></script>
+  <script src="{{ static_url('emotions/javascripts/jquery.cssemoticons.min.js') }}" type="text/javascript"></script>
   
-  <script src="{{ static_url('js/lib/jquery.min.js') }}" type="text/javascript"></script>
- 
+  
   
   <style>
 body {
@@ -61,6 +63,8 @@ body {
     var ws;
     online_users={};
     var nickname;
+    
+    
     function addMsg(text){
       console.log(text);
       var content = document.getElementById('content');
@@ -139,8 +143,9 @@ body {
                 return;
               }
               $("#chatbox_"+chat_user+" .chatboxcontent").append('<div class="chatboxmessage"><span class="chatboxmessagefrom">'+chat_user+':&nbsp;&nbsp;</span><span class="chatboxmessagecontent">'+message+'</span></div>');
+              
               $("#chatbox_"+chat_user+" .chatboxcontent").scrollTop($("#chatbox_"+chat_user+" .chatboxcontent")[0].scrollHeight);
-
+			  $('.chatboxmessagecontent').emoticonize();
               //$("#chatbox_"+chat_user+" .chatboxtextarea");
             }else if(json_data['type']=='chatsession'){
               //{"type":"chatsession","sessionkey":session_key, "from":to_user,"to":from_user,'history':cls.sessions[session_key].messages}
@@ -221,6 +226,10 @@ body {
     }
     
     </script>
-
+	<script>
+	$(document).ready(function(){
+		$('.chatboxmessagecontent').emoticonize();
+	});
+	</script>
 </body>
 </html>

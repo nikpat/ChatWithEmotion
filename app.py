@@ -3,7 +3,7 @@
 import os.path
 import re
 import tornado.auth
-import tornado.database
+#import tornado.database
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
@@ -15,15 +15,15 @@ import hashlib, uuid
 
 from tornado.options import define, options
 
-define("port", default=8080, help="run on the given port", type=int)
-define("mysql_host", default="127.0.0.1:3306", help="blog database host")
-define("mysql_database", default="qnadb", help="blog database name")
-define("mysql_user", default="root", help="blog database user")
-define("mysql_password", default="3rdr3d", help="blog database password")
+define("port", default=8081, help="run on the given port", type=int)
+#define("mysql_host", default="127.0.0.1:3306", help="blog database host")
+#define("mysql_database", default="qnadb", help="blog database name")
+#define("mysql_user", default="root", help="blog database user")
+#define("mysql_password", default="3rdr3d", help="blog database password")
 
-db = tornado.database.Connection(
-            host=options.mysql_host, database=options.mysql_database,
-            user=options.mysql_user, password=options.mysql_password)
+#db = tornado.database.Connection(
+#            host=options.mysql_host, database=options.mysql_database,
+#            user=options.mysql_user, password=options.mysql_password)
 
 class Application(tornado.web.Application):
 	def __init__(self):
@@ -202,14 +202,14 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
     def send_presence(cls, from_user, payload):
         print "sending presence from user {0} to his/her friends ".format(from_user)
         #get friends
-        friends=db.query("select u.username, c.userid from chatusercontacts c, chatuser where c.userid=u.id and c.userid=%s",from_user)
-        if not friends is None and len(friends)>0:
-            for friend in friends:
-                try:
-                    con=cls.users[friend['username']]
-                    con.write_message("{0}".format(payload))
-                except Exception, e:
-                    pass
+        #friends=db.query("select u.username, c.userid from chatusercontacts c, chatuser where c.userid=u.id and c.userid=%s",from_user)
+        #if not friends is None and len(friends)>0:
+        #    for friend in friends:
+        #        try:
+        #            con=cls.users[friend['username']]
+        #            con.write_message("{0}".format(payload))
+        #        except Exception, e:
+        #            pass
 
 
     @classmethod
