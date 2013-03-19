@@ -178,6 +178,23 @@
 			         $('.chatboxmessagecontent').emoticonize();
               //$("#chatbox_"+chat_user+" .chatboxtextarea");
             }
+            else if(json_data["type"]=="fileshare"){
+              var chat_user=json_data["from"];
+              var session_key=json_data["sessionkey"];
+              var message=json_data["message"];
+              console.log("Received message: "+JSON.stringify(json_data));
+
+              var box =$("#chatbox_"+chat_user);
+              if(!box || box.length==0){
+                chatWith(chat_user);
+                return;
+              }
+              $("#chatbox_"+chat_user+" .chatboxcontent").append('<div class="chatboxmessage"><span class="chatboxmessagefrom">'+chat_user+':&nbsp;&nbsp;</span><span class="chatboxmessagecontent"><a download="'+message+'" href="/static/uploads/'+message+'">'+message+'</a></span></div>');
+              
+              $("#chatbox_"+chat_user+" .chatboxcontent").scrollTop($("#chatbox_"+chat_user+" .chatboxcontent")[0].scrollHeight);
+              
+              //$("#chatbox_"+chat_user+" .chatboxtextarea");
+            }
             else if(json_data['type']=='chatsession'){
               //{"type":"chatsession","sessionkey":session_key, "from":to_user,"to":from_user,'history':cls.sessions[session_key].messages}
               var chat_user=json_data['from'];

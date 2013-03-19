@@ -78,6 +78,57 @@ function chatWith(chatuser) {
 	$("#chatbox_"+chatuser).find("div.chatboxtitle").text(chatuser+" connecting...");
 }
 
+function select_file(chatuser){
+	$("#file_upload_"+chatuser).trigger('click');
+	$("#file_upload_"+chatuser).change(function(){
+		var a = $(this).val();
+		var filename = a.slice(a.lastIndexOf("\\")+1,a.length);
+		console.log($(this).parent()[0]);
+		var formData = new FormData($(this).parent()[0]);
+		console.log('====');
+		console.log(formData);
+		console.log('====');
+		$.ajax({
+        url:"/upload",
+        type:"POST",
+        data:formData,
+        contentType:false,
+        processData:false,
+        cache:false,
+        success:function(resp){     		
+			var chat_data=$("#chatbox_"+chatuser).data('chatdata');
+			var msg_json={"type":"fileshare","to":chat_data['from'], "message":filename, "sessionkey":chat_data["sessionkey"], "from":chat_data["to"]};
+			console.log("Sending message :"+JSON.stringify(msg_json));	
+			ws.send(JSON.stringify(msg_json));
+			alert('done');
+            //$('div#status').html(resp);
+        },
+        error:function(resp){
+        	alert('error');
+            //$('div#status').html(resp);
+        },
+        xhr:function(){
+            myXhr = $.ajaxSettings.xhr();
+            if(myXhr.upload){
+                myXhr.upload.addEventListener('progress',handleProgress,false);
+            }
+            return myXhr;
+        }
+    	});
+	});
+}
+
+
+
+handleProgress = function(evnt){
+    if(evnt.lengthComputable){
+        var ratio = (evnt.loaded / evnt.total) * 100;
+        console.log(ratio);
+        //$('progress').attr({value:ratio})
+    }
+
+}
+
 function createChatBox(chatboxtitle,minimizeChatBox) {
 	if ($("#chatbox_"+chatboxtitle).length > 0) {
 		if ($("#chatbox_"+chatboxtitle).css('display') == 'none') {
@@ -90,7 +141,7 @@ function createChatBox(chatboxtitle,minimizeChatBox) {
 
 	$(" <div />" ).attr("id","chatbox_"+chatboxtitle)
 	.addClass("chatbox")
-	.html('<div class="chatboxhead"><div class="chatboxtitle">'+chatboxtitle+'</div><div class="chatboxoptions"><a href="javascript:void(0)" onclick="javascript:toggleChatBoxGrowth(\''+chatboxtitle+'\')">-</a> <a href="javascript:void(0)" onclick="javascript:closeChatBox(\''+chatboxtitle+'\')">X</a></div><br clear="all"/></div><div class="chatboxcontent"></div><div class="chatboxinput"><textarea class="chatboxtextarea" onkeydown="javascript:return checkChatBoxInputKey(event,this,\''+chatboxtitle+'\');"></textarea></div>')
+	.html('<div class="chatboxhead"><div class="chatboxtitle">'+chatboxtitle+'</div><div class="chatboxoptions" style="width:50px"><form style="margin: 0;width:0;height:0;visibility:hidden" method="POST" action="upload" enctype="multipart/form-data"><input style="margin: 0;width:0;height:0;visibility:hidden" id="file_upload_'+chatboxtitle+'" type="file" name="fupload"/></form><a href="javascript:void(0)" id="fileshare" onclick="javascript:select_file(\''+chatboxtitle+'\')"><i class="icon-upload"></i></a><a href="javascript:void(0)" onclick="javascript:toggleChatBoxGrowth(\''+chatboxtitle+'\')"><i class="icon-minus"></i></a> <a href="javascript:void(0)" onclick="javascript:closeChatBox(\''+chatboxtitle+'\')"><i class="icon-remove"></i></a></div><br clear="all"/></div><div class="chatboxcontent"></div><div class="chatboxinput"><textarea class="chatboxtextarea" onkeydown="javascript:return checkChatBoxInputKey(event,this,\''+chatboxtitle+'\');"></textarea></div>')
 	.appendTo($( "body" ));
 			   
 	$("#chatbox_"+chatboxtitle).css('bottom', '0px');

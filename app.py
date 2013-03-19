@@ -29,19 +29,28 @@ class Application(tornado.web.Application):
 	def __init__(self):
 		handlers = [
 			(r"/", RootHandler),
-            (r"/chat/(\w+)", ChatHandler)
+            (r"/chat/(\w+)", ChatHandler),
+            (r"/upload", Upload)
 			# Add your routes here
 		]
 		settings = dict(
-			app_name=u"Sena Chat",
+			app_name=u"Neo Chat",
 			template_path=os.path.join(os.path.dirname(__file__), "templates"),
 			static_path=os.path.join(os.path.dirname(__file__), "static"),
-			xsrf_cookies=True,
+			#xsrf_cookies=True,
 		)
 		tornado.web.Application.__init__(self, handlers, debug=True,**settings)
 		# Have one global connection to the blog DB across all handlers
-		
 
+		
+class Upload(tornado.web.RequestHandler):
+    def post(self):
+        print self.request.files
+        f = open(os.path.join(os.path.join(os.path.dirname(__file__), "static/uploads"),self.request.files["fupload"][0].filename),"w")
+        f.write(self.request.files["fupload"][0].body)
+        f.close
+        self.write("ok")
+        
 class ChatSession():
 
     def __init__(self, username1, username2):
@@ -193,6 +202,19 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
                 elif message_type=='presence':
                     print "presence from {0} status {1}".format(from_user,message['status'])
                     ChatHandler.send_presence()
+
+                elif message_type=='fileshare':
+                    from_user = json_data['from']
+                    to_user = json_data['to']
+                    sessionkey = json_data['sessionkey']
+                    message = json_data["message"]
+                    if sessionkey in ChatHandler.sessions:
+                        ChatHandler.sessions[sessionkey].messages.append(json_data)
+                    try:
+                        if to_user in ChatHandler.users:
+                            ChatHandler.users[to_user].write_message(json.dumps({"from":from_user,"to":to_user,"sessionkey":sessionkey, "message":message, "type":"fileshare"}))
+                    except Exception, e:
+                        print "error while file sharing"
         except Exception, e:
             print "Error occurred during message received {0}".format(e)
             self.error_msg("100")
@@ -252,7 +274,7 @@ class RootHandler(BaseHandler):
 		self.render("root.html")
 
 def main():
-	tornado.options.parse_command_line()
+	#tornado.options.parse_command_line()
 	http_server = tornado.httpserver.HTTPServer(Application())
 	http_server.listen(options.port)
 	tornado.ioloop.IOLoop.instance().start()
