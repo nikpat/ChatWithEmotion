@@ -90,7 +90,7 @@
    <script src="{{static_url('js/chat.js')}}" type="text/javascript"></script>
    
   <script type='text/javascript'>
-
+      /*
       if (window.webkitNotifications) {
                   if (window.webkitNotifications.checkPermission() == 0) { 
                       // 0 is PERMISSION_ALLOWED
@@ -104,10 +104,10 @@
                 else {
                   console.log("Notifications are not supported for this Browser/OS version yet.");
                 }
-      
+       */
 
     var ws;
-    online_users={};
+    online_users = {};
     var nickname;
     
     
@@ -183,12 +183,13 @@
               var message=json_data["message"];
               console.log("Received message: "+JSON.stringify(json_data));
               //set notification
+              /*
               if (window.webkitNotifications) {
                   window.webkitNotifications.createNotification('/static/img/notice.png',chat_user, message ).show();
                 }
                 else {
                   console.log("Notifications are not supported for this Browser/OS version yet.");
-                }
+                } */
               
 
               var box =$("#chatbox_"+chat_user);
